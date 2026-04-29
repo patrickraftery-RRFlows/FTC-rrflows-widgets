@@ -1,5 +1,5 @@
 /**
- * FTC Chat Widget v2.3
+ * FTC Chat Widget v2.3.1
  * Florida Technology Council - AI Assistant
  *
  * External-loader architecture (jsDelivr/CDN), pulled into Wix via a single
@@ -8,11 +8,10 @@
  * Posts:
  *   - chat:     POST https://n8n-ftc.rrflows.com/webhook/ftc-chat
  *   - feedback: POST https://n8n-ftc.rrflows.com/webhook/ftc-chat-feedback
- *   - handoff:  POST https://n8n-ftc.rrflows.com/webhook/ftc-contact
  *
+ * v2.3.1 (2026-04-29): drop "Talk to a human" handoff per Patrick's call.
  * v2.3 (2026-04-29):
  *   + Page-context aware welcome chips (different chips per FTC page)
- *   + "Talk to a human" handoff form (posts to FTC contact form webhook)
  *   + "Was this helpful?" thumbs feedback per bot reply
  *   + Accessibility: aria-live, Alt+C shortcut, Esc closes, error retry
  */
@@ -45,7 +44,6 @@
       return 'https://widgets.rrflows.com/ftc/'
     })(),
     feedbackUrl: 'https://n8n-ftc.rrflows.com/webhook/ftc-chat-feedback',
-    handoffUrl: 'https://n8n-ftc.rrflows.com/webhook/ftc-contact',
     botName: 'FTC Assistant',
     placeholder: 'Ask about FTC programs, events, membership...',
     welcomeMessage: 'Hi! I\'m the FTC AI Assistant. Ask me anything about the Florida Technology Council -- membership, events, programs, and more.',
@@ -190,8 +188,6 @@
           </button>
         </div>
         <div id="rrflows-chat-footer">
-          <button type="button" id="rrflows-chat-handoff-link" class="rrflows-chat-footer-link">Need a person?</button>
-          <span class="rrflows-chat-footer-sep" aria-hidden="true"> · </span>
           Powered by <a href="https://rrflows.com" target="_blank" rel="noopener noreferrer">RRFlows</a>
         </div>
       </div>
@@ -432,135 +428,6 @@
     messages.scrollTop = messages.scrollHeight
   }
 
-  // --- Talk to a human handoff ---
-  function renderHandoffForm() {
-    const messages = document.getElementById('rrflows-chat-messages')
-    document.getElementById('rrflows-chat-followups').innerHTML = ''
-    hideWelcomeChips()
-
-    const row = document.createElement('div')
-    row.className = 'rrflows-chat-row rrflows-chat-row-bot rrflows-chat-row-handoff'
-
-    const avatar = document.createElement('img')
-    avatar.className = 'rrflows-chat-avatar'
-    avatar.src = LOGO_URL
-    avatar.alt = ''
-    avatar.width = 26
-    avatar.height = 26
-    row.appendChild(avatar)
-
-    const card = document.createElement('div')
-    card.className = 'rrflows-chat-bubble rrflows-chat-bot rrflows-chat-handoff-card'
-    card.innerHTML = `
-      <p><strong>Talk to FTC directly</strong></p>
-      <p class="rrflows-chat-handoff-sub">Share a few details and FTC staff will follow up by email.</p>
-      <div class="rrflows-chat-handoff-row">
-        <label class="rrflows-chat-handoff-label" for="rrflows-handoff-first">First name *</label>
-        <input id="rrflows-handoff-first" type="text" required maxlength="80" autocomplete="given-name">
-      </div>
-      <div class="rrflows-chat-handoff-row">
-        <label class="rrflows-chat-handoff-label" for="rrflows-handoff-last">Last name *</label>
-        <input id="rrflows-handoff-last" type="text" required maxlength="80" autocomplete="family-name">
-      </div>
-      <div class="rrflows-chat-handoff-row">
-        <label class="rrflows-chat-handoff-label" for="rrflows-handoff-email">Email *</label>
-        <input id="rrflows-handoff-email" type="email" required maxlength="200" autocomplete="email">
-      </div>
-      <div class="rrflows-chat-handoff-row">
-        <label class="rrflows-chat-handoff-label" for="rrflows-handoff-reason">What can FTC help with?</label>
-        <textarea id="rrflows-handoff-reason" rows="3" maxlength="1000"></textarea>
-      </div>
-      <div class="rrflows-chat-handoff-error" role="alert" aria-live="polite"></div>
-      <div class="rrflows-chat-handoff-actions">
-        <button type="button" class="rrflows-chat-handoff-cancel">Cancel</button>
-        <button type="button" class="rrflows-chat-handoff-submit">Send</button>
-      </div>
-    `
-    row.appendChild(card)
-    messages.appendChild(row)
-    messages.scrollTop = messages.scrollHeight
-
-    // Prefill reason with last user message if any
-    const lastUserMsg = (function() {
-      const userBubbles = document.querySelectorAll('.rrflows-chat-user')
-      return userBubbles.length ? userBubbles[userBubbles.length - 1].textContent : ''
-    })()
-    if (lastUserMsg) {
-      const reasonEl = card.querySelector('#rrflows-handoff-reason')
-      if (reasonEl) reasonEl.value = 'I have a question about: ' + lastUserMsg.slice(0, 400)
-    }
-
-    setTimeout(function() {
-      const first = card.querySelector('#rrflows-handoff-first')
-      if (first) first.focus()
-    }, 50)
-
-    card.querySelector('.rrflows-chat-handoff-cancel').addEventListener('click', function() {
-      row.remove()
-    })
-    card.querySelector('.rrflows-chat-handoff-submit').addEventListener('click', function() {
-      submitHandoff(card, row)
-    })
-  }
-
-  async function submitHandoff(card, row) {
-    const errEl = card.querySelector('.rrflows-chat-handoff-error')
-    errEl.textContent = ''
-
-    const firstName = (card.querySelector('#rrflows-handoff-first').value || '').trim().slice(0, 80)
-    const lastName = (card.querySelector('#rrflows-handoff-last').value || '').trim().slice(0, 80)
-    const email = (card.querySelector('#rrflows-handoff-email').value || '').trim().slice(0, 200)
-    const reason = (card.querySelector('#rrflows-handoff-reason').value || '').trim().slice(0, 1000)
-
-    if (!firstName) { errEl.textContent = 'First name is required.'; return }
-    if (!lastName) { errEl.textContent = 'Last name is required.'; return }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { errEl.textContent = 'Please enter a valid email address.'; return }
-
-    // Build conversation transcript
-    const transcript = []
-    const rows = document.querySelectorAll('#rrflows-chat-messages .rrflows-chat-row')
-    rows.forEach(function(r) {
-      const bubble = r.querySelector('.rrflows-chat-bubble')
-      if (!bubble) return
-      const role = r.classList.contains('rrflows-chat-row-user') ? 'Visitor' : 'Assistant'
-      const text = (bubble.textContent || '').trim()
-      if (text) transcript.push(role + ': ' + text)
-    })
-    const message = (reason ? reason + '\n\n' : '') +
-      '--- Conversation transcript ---\n' + transcript.join('\n').slice(0, 8000)
-
-    const submitBtn = card.querySelector('.rrflows-chat-handoff-submit')
-    submitBtn.disabled = true
-    submitBtn.textContent = 'Sending...'
-
-    try {
-      const res = await fetch(CONFIG.handoffUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          data: {
-            firstName,
-            lastName,
-            email,
-            subject: 'Chatbot handoff: ' + (reason ? reason.slice(0, 80) : 'Visitor requested human contact'),
-            message,
-            formId: 'chatbot-handoff',
-            time: new Date().toISOString()
-          }
-        })
-      })
-
-      if (!res.ok) throw new Error('HTTP ' + res.status)
-
-      // Replace card with confirmation
-      row.remove()
-      addMessage('bot', 'Thanks ' + firstName + '! FTC staff will follow up by email shortly. Feel free to keep chatting in the meantime.')
-    } catch (e) {
-      submitBtn.disabled = false
-      submitBtn.textContent = 'Send'
-      errEl.textContent = 'Something went wrong. Please try again or email membership@fltechcouncil.org directly.'
-    }
-  }
 
   function renderFollowUps(questions) {
     const container = document.getElementById('rrflows-chat-followups')
@@ -739,15 +606,6 @@
     toggle.addEventListener('click', openWindow)
     minimize.addEventListener('click', minimizeWindow)
     close.addEventListener('click', closeWindow)
-
-    const handoffLink = document.getElementById('rrflows-chat-handoff-link')
-    if (handoffLink) {
-      handoffLink.addEventListener('click', function(e) {
-        e.preventDefault()
-        if (!isOpen()) openWindow()
-        renderHandoffForm()
-      })
-    }
 
     input.addEventListener('keydown', function(e) {
       if (e.key === 'Enter' && !e.shiftKey) {
@@ -1171,22 +1029,6 @@
         40%           { transform: translateY(-5px); opacity: 1; }
       }
 
-      /* Footer link (Need a person?) */
-      .rrflows-chat-footer-link {
-        background: none;
-        border: none;
-        color: var(--ftc-link);
-        font-size: inherit;
-        font-family: inherit;
-        font-weight: 500;
-        cursor: pointer;
-        padding: 4px 6px;
-        text-decoration: underline;
-        transition: color 0.15s ease;
-      }
-      .rrflows-chat-footer-link:hover { color: var(--ftc-primary); }
-      .rrflows-chat-footer-sep { color: var(--ftc-border-strong); padding: 0 4px; }
-
       /* Feedback (thumbs) */
       .rrflows-chat-feedback {
         display: flex;
@@ -1293,91 +1135,6 @@
       .rrflows-chat-retry-btn:hover {
         background: var(--ftc-primary);
         color: #fff;
-      }
-
-      /* Handoff form */
-      .rrflows-chat-handoff-card {
-        max-width: 100% !important;
-        width: 100%;
-      }
-      .rrflows-chat-handoff-card p {
-        margin: 0 0 6px;
-      }
-      .rrflows-chat-handoff-sub {
-        font-size: 12px;
-        color: var(--ftc-text-muted);
-        margin-bottom: 10px !important;
-      }
-      .rrflows-chat-handoff-row {
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-        margin-bottom: 8px;
-      }
-      .rrflows-chat-handoff-label {
-        font-size: 11px;
-        font-weight: 500;
-        color: var(--ftc-text-muted);
-      }
-      .rrflows-chat-handoff-card input,
-      .rrflows-chat-handoff-card textarea {
-        width: 100%;
-        border: 1px solid var(--ftc-chip-border);
-        border-radius: 8px;
-        padding: 7px 10px;
-        font-family: inherit;
-        font-size: 13px;
-        outline: none;
-        background: var(--ftc-surface);
-        color: var(--ftc-text);
-        transition: border-color 0.15s ease, box-shadow 0.15s ease;
-      }
-      .rrflows-chat-handoff-card input:focus,
-      .rrflows-chat-handoff-card textarea:focus {
-        border-color: var(--ftc-primary);
-        box-shadow: 0 0 0 2px rgba(15, 44, 92, 0.12);
-      }
-      .rrflows-chat-handoff-card textarea {
-        resize: vertical;
-        min-height: 60px;
-      }
-      .rrflows-chat-handoff-error {
-        font-size: 11px;
-        color: #b91c1c;
-        min-height: 14px;
-        margin: 4px 0;
-      }
-      .rrflows-chat-handoff-error:empty { display: none; }
-      .rrflows-chat-handoff-actions {
-        display: flex;
-        gap: 8px;
-        justify-content: flex-end;
-        margin-top: 4px;
-      }
-      .rrflows-chat-handoff-cancel,
-      .rrflows-chat-handoff-submit {
-        padding: 8px 14px;
-        font-size: 13px;
-        font-family: inherit;
-        border-radius: 16px;
-        cursor: pointer;
-        min-height: 36px;
-      }
-      .rrflows-chat-handoff-cancel {
-        background: transparent;
-        color: var(--ftc-text-muted);
-        border: 1px solid var(--ftc-chip-border);
-      }
-      .rrflows-chat-handoff-cancel:hover { background: var(--ftc-chip-bg); }
-      .rrflows-chat-handoff-submit {
-        background: linear-gradient(135deg, var(--ftc-primary) 0%, var(--ftc-accent) 100%);
-        color: #fff;
-        border: none;
-      }
-      .rrflows-chat-handoff-submit:hover { filter: brightness(1.08); }
-      .rrflows-chat-handoff-submit:disabled {
-        background: #94a3b8;
-        cursor: not-allowed;
       }
 
       /* Mobile responsive */
