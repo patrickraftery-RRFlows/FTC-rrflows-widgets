@@ -1014,15 +1014,19 @@
         text-align: center;
         min-width: 0;
         width: 100%;
-        min-height: 40px;
+        height: 48px;
+        min-height: 48px;
         display: flex;
         align-items: center;
         justify-content: center;
+        align-self: stretch;
       }
       .rrflows-chat-chip-welcome:nth-child(3) {
         grid-column: 1 / span 2;
         justify-self: center;
         width: calc(50% - 3px);
+        height: 48px;
+        min-height: 48px;
       }
 
       /* Follow-up chips */
