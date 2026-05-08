@@ -157,18 +157,23 @@
         <div id="rrflows-chat-header">
           <img class="rrflows-chat-header-logo" src="${LOGO_URL}" alt="" width="36" height="36">
           <div id="rrflows-chat-header-info">
-            <span id="rrflows-chat-header-name">${CONFIG.botName}</span>
+            <div class="rrflows-chat-header-title-row">
+              <span id="rrflows-chat-header-name">${CONFIG.botName}</span>
+              <span class="rrflows-chat-header-pill">AI</span>
+            </div>
             <span id="rrflows-chat-header-status">
               <span class="rrflows-chat-status-dot"></span>Online
+              <span class="rrflows-chat-header-sep">&middot;</span>
+              <span class="rrflows-chat-header-source">Powered by FTC content</span>
             </span>
           </div>
           <div id="rrflows-chat-header-actions">
-            <button id="rrflows-chat-minimize" aria-label="Minimize chat" title="Minimize">
+            <button id="rrflows-chat-minimize" class="rrflows-chat-tooltip" aria-label="Minimize chat" data-tooltip="Minimize">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
                 <line x1="5" y1="12" x2="19" y2="12"></line>
               </svg>
             </button>
-            <button id="rrflows-chat-close" aria-label="Close chat" title="Close">
+            <button id="rrflows-chat-close" class="rrflows-chat-tooltip" aria-label="Close chat" data-tooltip="Close">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
                 <line x1="6" y1="6" x2="18" y2="18"></line>
                 <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -180,15 +185,26 @@
         <div id="rrflows-chat-welcome-chips"></div>
         <div id="rrflows-chat-followups"></div>
         <div id="rrflows-chat-input-area">
-          <input id="rrflows-chat-input" type="text" placeholder="${CONFIG.placeholder}" maxlength="${CONFIG.maxMessageLength}" autocomplete="off" aria-label="Type your question">
-          <button id="rrflows-chat-send" aria-label="Send message">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-            </svg>
-          </button>
+          <div id="rrflows-chat-input-row">
+            <input id="rrflows-chat-input" type="text" placeholder="${CONFIG.placeholder}" maxlength="${CONFIG.maxMessageLength}" autocomplete="off" aria-label="Type your question">
+            <button id="rrflows-chat-send" aria-label="Send message">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+              </svg>
+            </button>
+          </div>
+          <div id="rrflows-chat-input-meta">
+            <span id="rrflows-chat-char-counter"><span id="rrflows-chat-char-current">0</span>/${CONFIG.maxMessageLength}</span>
+          </div>
         </div>
         <div id="rrflows-chat-footer">
-          Powered by <a href="https://rrflows.com" target="_blank" rel="noopener noreferrer">RRFlows</a>
+          <div id="rrflows-chat-footer-status">
+            <span class="rrflows-chat-footer-dot"></span>
+            <span>All systems operational</span>
+          </div>
+          <div id="rrflows-chat-footer-brand">
+            Powered by <a href="https://rrflows.com" target="_blank" rel="noopener noreferrer">RRFlows</a>
+          </div>
         </div>
       </div>
     `
@@ -271,6 +287,26 @@
 
     row.appendChild(bubble)
     messages.appendChild(row)
+
+    // Source citation pills (rendered when webhook returns extras.sources)
+    if (role === 'bot' && extras && Array.isArray(extras.sources) && extras.sources.length > 0) {
+      const citations = document.createElement('div')
+      citations.className = 'rrflows-chat-citations'
+      const limit = Math.min(extras.sources.length, 4)
+      for (let i = 0; i < limit; i++) {
+        const src = extras.sources[i]
+        if (!src || !src.url) continue
+        const pill = document.createElement('a')
+        pill.className = 'rrflows-chat-citation-pill'
+        pill.href = src.url
+        pill.target = '_blank'
+        pill.rel = 'noopener noreferrer'
+        pill.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span class="rrflows-chat-citation-label"></span>'
+        pill.querySelector('.rrflows-chat-citation-label').textContent = src.title || src.url
+        citations.appendChild(pill)
+      }
+      messages.appendChild(citations)
+    }
 
     // Feedback thumbs for bot replies (skip welcome message + error fallbacks)
     if (role === 'bot' && extras && extras.allowFeedback) {
@@ -402,8 +438,8 @@
     avatar.className = 'rrflows-chat-avatar'
     avatar.src = LOGO_URL
     avatar.alt = ''
-    avatar.width = 26
-    avatar.height = 26
+    avatar.width = 22
+    avatar.height = 22
     row.appendChild(avatar)
 
     const bubble = document.createElement('div')
@@ -472,12 +508,12 @@
     avatar.className = 'rrflows-chat-avatar'
     avatar.src = LOGO_URL
     avatar.alt = ''
-    avatar.width = 26
-    avatar.height = 26
+    avatar.width = 22
+    avatar.height = 22
     row.appendChild(avatar)
     const typing = document.createElement('div')
     typing.className = 'rrflows-chat-bubble rrflows-chat-bot rrflows-chat-typing'
-    typing.innerHTML = '<span></span><span></span><span></span>'
+    typing.innerHTML = '<div class="rrflows-chat-shimmer"></div><div class="rrflows-chat-shimmer rrflows-chat-shimmer-short"></div>'
     row.appendChild(typing)
     messages.appendChild(row)
     messages.scrollTop = messages.scrollHeight
@@ -547,6 +583,7 @@
         addMessage('bot', data.answer, {
           followUpQuestions: data.followUpQuestions || [],
           suggestions: data.suggestions || [],
+          sources: data.sources || [],
           allowFeedback: true
         })
       } else {
@@ -586,17 +623,25 @@
     }
 
     function minimizeWindow() {
-      window_.classList.add('rrflows-chat-hidden')
-      toggle.classList.remove('rrflows-chat-toggle-hidden')
+      window_.classList.add('rrflows-chat-closing')
+      setTimeout(function() {
+        window_.classList.add('rrflows-chat-hidden')
+        window_.classList.remove('rrflows-chat-closing')
+        toggle.classList.remove('rrflows-chat-toggle-hidden')
+      }, 240)
     }
 
     function closeWindow() {
-      window_.classList.add('rrflows-chat-hidden')
-      toggle.classList.remove('rrflows-chat-toggle-hidden')
-      messages.innerHTML = ''
-      hideWelcomeChips()
-      document.getElementById('rrflows-chat-followups').innerHTML = ''
-      opened = false
+      window_.classList.add('rrflows-chat-closing')
+      setTimeout(function() {
+        window_.classList.add('rrflows-chat-hidden')
+        window_.classList.remove('rrflows-chat-closing')
+        toggle.classList.remove('rrflows-chat-toggle-hidden')
+        messages.innerHTML = ''
+        hideWelcomeChips()
+        document.getElementById('rrflows-chat-followups').innerHTML = ''
+        opened = false
+      }, 240)
     }
 
     function isOpen() {
@@ -611,6 +656,17 @@
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault()
         sendMessage(input.value)
+      }
+    })
+
+    const charCurrent = document.getElementById('rrflows-chat-char-current')
+    const charCounter = document.getElementById('rrflows-chat-char-counter')
+    input.addEventListener('input', function() {
+      const len = input.value.length
+      if (charCurrent) charCurrent.textContent = len
+      if (charCounter) {
+        if (len > CONFIG.maxMessageLength * 0.9) charCounter.classList.add('rrflows-chat-char-warn')
+        else charCounter.classList.remove('rrflows-chat-char-warn')
       }
     })
 
@@ -758,6 +814,21 @@
         box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
       }
       #rrflows-chat-header-info { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+      .rrflows-chat-header-title-row { display: flex; align-items: center; gap: 8px; }
+      .rrflows-chat-header-pill {
+        font-size: 9.5px;
+        font-weight: 700;
+        letter-spacing: 0.4px;
+        padding: 1px 7px;
+        background: rgba(255, 255, 255, 0.18);
+        border: 1px solid rgba(255, 255, 255, 0.28);
+        border-radius: 8px;
+        color: #fff;
+        text-transform: uppercase;
+        line-height: 1.5;
+      }
+      .rrflows-chat-header-sep { opacity: 0.5; margin: 0 2px; }
+      .rrflows-chat-header-source { opacity: 0.85; }
       #rrflows-chat-header-name { font-weight: 600; font-size: 15px; letter-spacing: 0.1px; }
       #rrflows-chat-header-status {
         font-size: 11px;
@@ -796,6 +867,44 @@
       #rrflows-chat-minimize:hover, #rrflows-chat-close:hover {
         background: rgba(255, 255, 255, 0.22);
         opacity: 1;
+      }
+
+      /* Tooltip pattern */
+      .rrflows-chat-tooltip { position: relative; }
+      .rrflows-chat-tooltip::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        top: calc(100% + 6px);
+        left: 50%;
+        transform: translateX(-50%) translateY(-4px);
+        padding: 4px 8px;
+        background: rgba(15, 23, 42, 0.94);
+        color: #fff;
+        font-size: 10px;
+        font-weight: 500;
+        letter-spacing: 0.2px;
+        border-radius: 4px;
+        white-space: nowrap;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.18s ease, transform 0.18s ease;
+        z-index: 10;
+        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.25);
+      }
+      .rrflows-chat-tooltip:hover::after {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+        transition-delay: 0.2s;
+      }
+
+      /* Closing animation */
+      .rrflows-chat-closing {
+        animation: rrflows-slide-out 240ms cubic-bezier(0.4, 0, 0.6, 1) forwards !important;
+        pointer-events: none;
+      }
+      @keyframes rrflows-slide-out {
+        from { opacity: 1; transform: scale(1) translateY(0); }
+        to   { opacity: 0; transform: scale(0.92) translateY(14px); }
       }
 
       /* Messages area */
@@ -978,12 +1087,26 @@
       /* Input area */
       #rrflows-chat-input-area {
         display: flex;
-        padding: 10px 12px;
-        gap: 8px;
+        flex-direction: column;
+        gap: 4px;
+        padding: 10px 12px 6px;
         border-top: 1px solid var(--ftc-border);
         background: var(--ftc-surface);
         flex-shrink: 0;
       }
+      #rrflows-chat-input-row { display: flex; gap: 8px; }
+      #rrflows-chat-input-meta {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        font-size: 10px;
+        color: var(--ftc-text-muted);
+        padding: 0 6px;
+        font-variant-numeric: tabular-nums;
+        letter-spacing: 0.2px;
+      }
+      #rrflows-chat-char-counter { transition: color 0.2s ease; }
+      .rrflows-chat-char-warn { color: #d97706 !important; }
       #rrflows-chat-input {
         flex: 1;
         border: 1px solid var(--ftc-chip-border);
@@ -1054,14 +1177,32 @@
         100% { transform: scale(1.4); opacity: 0;   }
       }
 
-      /* Footer */
+      /* Footer status bar */
       #rrflows-chat-footer {
-        padding: 6px 12px 8px;
-        text-align: center;
-        font-size: 11px;
+        padding: 8px 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        font-size: 10.5px;
         color: var(--ftc-text-muted);
         background: var(--ftc-surface);
         border-top: 1px solid var(--ftc-border);
+        flex-shrink: 0;
+      }
+      #rrflows-chat-footer-status {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        letter-spacing: 0.1px;
+      }
+      .rrflows-chat-footer-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #10b981;
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6);
+        animation: rrflows-status-pulse 2s ease-in-out infinite;
         flex-shrink: 0;
       }
       #rrflows-chat-footer a {
@@ -1071,24 +1212,73 @@
       }
       #rrflows-chat-footer a:hover { color: var(--ftc-primary); text-decoration: underline; }
 
-      /* Typing indicator */
+      /* Branded shimmer typing indicator */
       .rrflows-chat-typing {
         display: flex;
-        gap: 4px;
-        padding: 12px 18px;
+        flex-direction: column;
+        gap: 6px;
+        padding: 14px 16px;
+        min-width: 100px;
       }
-      .rrflows-chat-typing span {
-        width: 6px;
-        height: 6px;
-        background: var(--ftc-text-muted);
-        border-radius: 50%;
-        animation: rrflows-bounce 1.2s ease-in-out infinite;
+      .rrflows-chat-shimmer {
+        height: 8px;
+        width: 80px;
+        border-radius: 4px;
+        background: linear-gradient(90deg,
+          rgba(15, 44, 92, 0.08) 0%,
+          rgba(15, 44, 92, 0.28) 50%,
+          rgba(15, 44, 92, 0.08) 100%);
+        background-size: 200% 100%;
+        animation: rrflows-shimmer 1.4s ease-in-out infinite;
       }
-      .rrflows-chat-typing span:nth-child(2) { animation-delay: 0.15s; }
-      .rrflows-chat-typing span:nth-child(3) { animation-delay: 0.3s; }
-      @keyframes rrflows-bounce {
-        0%, 80%, 100% { transform: translateY(0); opacity: 0.5; }
-        40%           { transform: translateY(-5px); opacity: 1; }
+      .rrflows-chat-shimmer-short {
+        width: 52px;
+        animation-delay: 0.18s;
+      }
+      @keyframes rrflows-shimmer {
+        0%   { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+      }
+
+      /* Citation pills (rendered when webhook returns sources array) */
+      .rrflows-chat-citations {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin: -2px 0 0 32px;
+        padding: 0;
+        max-width: calc(100% - 32px);
+      }
+      .rrflows-chat-citation-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 10px;
+        background: rgba(15, 44, 92, 0.05);
+        border: 1px solid rgba(15, 44, 92, 0.14);
+        color: var(--ftc-primary);
+        font-size: 11px;
+        font-weight: 500;
+        line-height: 1.3;
+        border-radius: 12px;
+        text-decoration: none;
+        transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .rrflows-chat-citation-pill:hover {
+        background: rgba(15, 44, 92, 0.10);
+        border-color: rgba(15, 44, 92, 0.25);
+        transform: translateY(-1px);
+      }
+      .rrflows-chat-citation-pill svg { opacity: 0.7; flex-shrink: 0; }
+      .rrflows-chat-citation-label {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 180px;
       }
 
       /* Feedback (thumbs) */
