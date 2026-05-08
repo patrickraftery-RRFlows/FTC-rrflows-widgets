@@ -162,8 +162,6 @@
             </div>
             <span id="rrflows-chat-header-status">
               <span class="rrflows-chat-status-dot"></span>Online
-              <span class="rrflows-chat-header-sep">&middot;</span>
-              <span class="rrflows-chat-header-source">Powered by FTC content</span>
             </span>
           </div>
           <div id="rrflows-chat-header-actions">
@@ -1032,10 +1030,19 @@
         background: var(--ftc-surface-soft);
       }
       #rrflows-chat-welcome-chips:empty { padding: 0; }
-      .rrflows-chat-chip-welcome { text-align: center; min-width: 0; }
+      .rrflows-chat-chip-welcome {
+        text-align: center;
+        min-width: 0;
+        width: 100%;
+        min-height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
       .rrflows-chat-chip-welcome:nth-child(3) {
         grid-column: 1 / span 2;
         justify-self: center;
+        width: calc(50% - 3px);
       }
 
       /* Follow-up chips */
