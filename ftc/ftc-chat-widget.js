@@ -88,7 +88,6 @@
     welcomeChipsDefault: [
       'What are the benefits of FTC membership?',
       'What upcoming events do you have?',
-      'Tell me about FTC programs',
       'How do I contact FTC?'
     ],
     rateLimit: 8,
@@ -242,7 +241,7 @@
   function renderWelcomeChips() {
     const container = document.getElementById('rrflows-chat-welcome-chips')
     container.innerHTML = ''
-    const chips = getWelcomeChipsForRoute()
+    const chips = getWelcomeChipsForRoute().slice(0, 3)
     for (const text of chips) {
       const chip = document.createElement('button')
       chip.className = 'rrflows-chat-chip rrflows-chat-chip-welcome'
@@ -1023,16 +1022,21 @@
         top: 16px;
       }
 
-      /* Welcome chips (shown on first open) */
+      /* Welcome chips (shown on first open) — 2+1 grid layout */
       #rrflows-chat-welcome-chips {
-        padding: 0 16px 8px;
-        display: flex;
-        flex-wrap: wrap;
+        padding: 0 16px 10px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
         gap: 6px;
         flex-shrink: 0;
         background: var(--ftc-surface-soft);
       }
       #rrflows-chat-welcome-chips:empty { padding: 0; }
+      .rrflows-chat-chip-welcome { text-align: center; min-width: 0; }
+      .rrflows-chat-chip-welcome:nth-child(3) {
+        grid-column: 1 / span 2;
+        justify-self: center;
+      }
 
       /* Follow-up chips */
       #rrflows-chat-followups {
