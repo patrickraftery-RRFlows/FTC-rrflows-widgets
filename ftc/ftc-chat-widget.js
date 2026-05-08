@@ -255,8 +255,8 @@
       avatar.className = 'rrflows-chat-avatar'
       avatar.src = LOGO_URL
       avatar.alt = ''
-      avatar.width = 26
-      avatar.height = 26
+      avatar.width = 22
+      avatar.height = 22
       row.appendChild(avatar)
     }
 
@@ -682,14 +682,17 @@
         align-items: center;
         justify-content: center;
         padding: 0;
-        box-shadow: 0 4px 14px rgba(15, 44, 92, 0.30), 0 0 0 0 rgba(15, 44, 92, 0.4);
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 4px 14px rgba(15, 44, 92, 0.30), 0 0 24px rgba(15, 44, 92, 0.22), 0 0 48px rgba(15, 44, 92, 0.12), 0 0 0 0 rgba(15, 44, 92, 0.4);
+        transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.2s ease;
         animation: rrflows-pulse 3s ease-in-out infinite;
       }
       #rrflows-chat-toggle:hover {
-        transform: scale(1.06);
-        box-shadow: 0 6px 20px rgba(15, 44, 92, 0.40), 0 0 0 8px rgba(15, 44, 92, 0.08);
+        transform: scale(1.05) rotate(-3deg);
+        box-shadow: 0 6px 20px rgba(15, 44, 92, 0.40), 0 0 32px rgba(15, 44, 92, 0.30), 0 0 56px rgba(15, 44, 92, 0.18), 0 0 0 8px rgba(15, 44, 92, 0.08);
         animation: none;
+      }
+      #rrflows-chat-toggle:active {
+        transform: scale(0.96);
       }
       .rrflows-chat-toggle-logo {
         width: 44px;
@@ -697,10 +700,15 @@
         border-radius: 50%;
         display: block;
       }
-      .rrflows-chat-toggle-hidden { display: none !important; }
+      .rrflows-chat-toggle-hidden {
+        opacity: 0 !important;
+        transform: scale(0.6) rotate(90deg) !important;
+        pointer-events: none !important;
+        animation: none !important;
+      }
       @keyframes rrflows-pulse {
-        0%, 100% { box-shadow: 0 4px 14px rgba(15, 44, 92, 0.30), 0 0 0 0 rgba(15, 44, 92, 0.5); }
-        50%      { box-shadow: 0 4px 14px rgba(15, 44, 92, 0.30), 0 0 0 12px rgba(15, 44, 92, 0); }
+        0%, 100% { box-shadow: 0 4px 14px rgba(15, 44, 92, 0.30), 0 0 24px rgba(15, 44, 92, 0.22), 0 0 48px rgba(15, 44, 92, 0.12), 0 0 0 0 rgba(15, 44, 92, 0.55); }
+        50%      { box-shadow: 0 4px 14px rgba(15, 44, 92, 0.30), 0 0 28px rgba(15, 44, 92, 0.30), 0 0 56px rgba(15, 44, 92, 0.16), 0 0 0 14px rgba(15, 44, 92, 0); }
       }
 
       /* Chat window */
@@ -709,21 +717,24 @@
         max-width: calc(100vw - 40px);
         height: 720px;
         max-height: calc(100vh - 100px);
-        background: var(--ftc-surface);
+        background: rgba(255, 255, 255, 0.94);
         border-radius: 16px;
-        box-shadow: 0 12px 40px rgba(15, 23, 42, 0.18), 0 2px 8px rgba(15, 23, 42, 0.08);
+        box-shadow: 0 12px 40px rgba(15, 23, 42, 0.18), 0 2px 8px rgba(15, 23, 42, 0.08), 0 0 0 1px rgba(255, 255, 255, 0.4) inset;
         display: flex;
         flex-direction: column;
         overflow: hidden;
         position: absolute;
         bottom: 0;
         right: 0;
-        animation: rrflows-slide-in 220ms cubic-bezier(0.16, 1, 0.3, 1);
+        animation: rrflows-slide-in 280ms cubic-bezier(0.175, 0.885, 0.32, 1.15);
+        backdrop-filter: blur(12px) saturate(1.05);
+        -webkit-backdrop-filter: blur(12px) saturate(1.05);
+        transform-origin: bottom right;
       }
       .rrflows-chat-hidden { display: none !important; }
       @keyframes rrflows-slide-in {
-        from { opacity: 0; transform: translateY(8px); }
-        to   { opacity: 1; transform: translateY(0); }
+        from { opacity: 0; transform: scale(0.92) translateY(14px); }
+        to   { opacity: 1; transform: scale(1) translateY(0); }
       }
 
       /* Header */
@@ -802,7 +813,7 @@
       /* Message rows (avatar + bubble) */
       .rrflows-chat-row {
         display: flex;
-        gap: 8px;
+        gap: 4px;
         align-items: flex-end;
         max-width: 100%;
         min-width: 0;
@@ -838,6 +849,26 @@
         from { opacity: 0; transform: translateY(4px); }
         to   { opacity: 1; transform: translateY(0); }
       }
+      @keyframes rrflows-content-in {
+        from { opacity: 0; transform: translateX(-4px); }
+        to   { opacity: 1; transform: translateX(0); }
+      }
+      .rrflows-chat-bot > p,
+      .rrflows-chat-bot > .rrflows-chat-list-item,
+      .rrflows-chat-bot > .rrflows-chat-heading,
+      .rrflows-chat-bot > .rrflows-chat-subheading {
+        animation: rrflows-content-in 320ms ease-out backwards;
+      }
+      .rrflows-chat-bot > *:nth-child(1)  { animation-delay: 0.10s; }
+      .rrflows-chat-bot > *:nth-child(2)  { animation-delay: 0.18s; }
+      .rrflows-chat-bot > *:nth-child(3)  { animation-delay: 0.26s; }
+      .rrflows-chat-bot > *:nth-child(4)  { animation-delay: 0.34s; }
+      .rrflows-chat-bot > *:nth-child(5)  { animation-delay: 0.42s; }
+      .rrflows-chat-bot > *:nth-child(6)  { animation-delay: 0.50s; }
+      .rrflows-chat-bot > *:nth-child(7)  { animation-delay: 0.58s; }
+      .rrflows-chat-bot > *:nth-child(8)  { animation-delay: 0.66s; }
+      .rrflows-chat-bot > *:nth-child(9)  { animation-delay: 0.74s; }
+      .rrflows-chat-bot > *:nth-child(10) { animation-delay: 0.82s; }
       .rrflows-chat-user {
         background: linear-gradient(135deg, var(--ftc-primary) 0%, var(--ftc-primary-deep) 100%);
         color: #fff;
@@ -914,16 +945,16 @@
       .rrflows-chat-chip {
         background: var(--ftc-chip-bg);
         border: 1px solid var(--ftc-chip-border);
-        border-radius: 14px;
-        padding: 4px 10px;
-        font-size: 11px;
+        border-radius: 12px;
+        padding: 3px 8px;
+        font-size: 10.5px;
         color: var(--ftc-primary);
         cursor: pointer;
         transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
         text-align: left;
-        line-height: 1.4;
+        line-height: 1.35;
         font-family: inherit;
-        min-height: 26px;
+        min-height: 22px;
       }
       .rrflows-chat-chip:hover {
         background: #dde7f3;
@@ -971,6 +1002,7 @@
       }
       #rrflows-chat-input:disabled { background: #f1f5f9; }
       #rrflows-chat-send {
+        position: relative;
         width: 44px;
         height: 44px;
         border-radius: 50%;
@@ -982,20 +1014,44 @@
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
-        transition: transform 0.1s ease, box-shadow 0.15s ease;
-        box-shadow: 0 2px 4px rgba(15, 44, 92, 0.25);
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+        box-shadow: 0 2px 6px rgba(15, 44, 92, 0.28), 0 0 0 0 rgba(15, 44, 92, 0.0);
+        overflow: visible;
+      }
+      #rrflows-chat-send::after {
+        content: '';
+        position: absolute;
+        inset: -4px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(15, 44, 92, 0.35) 0%, rgba(15, 44, 92, 0) 70%);
+        opacity: 0;
+        transition: opacity 0.2s ease;
+        pointer-events: none;
+        z-index: -1;
       }
       #rrflows-chat-send:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 8px rgba(15, 44, 92, 0.35);
+        transform: scale(1.06) rotate(-3deg);
+        box-shadow: 0 6px 16px rgba(15, 44, 92, 0.40), 0 0 24px rgba(15, 44, 92, 0.30);
       }
+      #rrflows-chat-send:hover::after {
+        opacity: 1;
+        animation: rrflows-send-ping 1.4s ease-out infinite;
+      }
+      #rrflows-chat-send:active { transform: scale(0.94); }
       #rrflows-chat-send:active svg { transform: rotate(8deg); }
-      #rrflows-chat-send svg { transition: transform 0.1s ease; }
+      #rrflows-chat-send svg { transition: transform 0.15s ease; }
+      #rrflows-chat-send:hover svg { transform: translateX(1px) translateY(-1px); }
       #rrflows-chat-send:disabled {
         background: #94a3b8;
         cursor: not-allowed;
         transform: none;
         box-shadow: none;
+      }
+      #rrflows-chat-send:disabled::after { display: none; }
+      @keyframes rrflows-send-ping {
+        0%   { transform: scale(1);   opacity: 0.8; }
+        80%  { transform: scale(1.4); opacity: 0;   }
+        100% { transform: scale(1.4); opacity: 0;   }
       }
 
       /* Footer */
