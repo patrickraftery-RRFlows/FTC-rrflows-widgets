@@ -791,6 +791,7 @@
       #rrflows-chat-messages {
         flex: 1;
         overflow-y: auto;
+        overflow-x: hidden;
         padding: 16px;
         display: flex;
         flex-direction: column;
@@ -804,6 +805,7 @@
         gap: 8px;
         align-items: flex-end;
         max-width: 100%;
+        min-width: 0;
       }
       .rrflows-chat-row-user {
         justify-content: flex-end;
@@ -824,9 +826,11 @@
       /* Message bubbles */
       .rrflows-chat-bubble {
         max-width: 85%;
+        min-width: 0;
         padding: 10px 14px;
         word-wrap: break-word;
         overflow-wrap: break-word;
+        word-break: break-word;
         animation: rrflows-bubble-in 180ms ease-out;
       }
       @keyframes rrflows-bubble-in {
