@@ -707,7 +707,7 @@
       #rrflows-chat-window {
         width: 420px;
         max-width: calc(100vw - 40px);
-        height: 540px;
+        height: 720px;
         max-height: calc(100vh - 100px);
         background: var(--ftc-surface);
         border-radius: 16px;
@@ -853,7 +853,7 @@
       }
 
       /* Markdown content styles */
-      .rrflows-chat-bot p { margin: 0 0 8px 0; }
+      .rrflows-chat-bot p { margin: 0 0 12px 0; }
       .rrflows-chat-bot p:last-child { margin-bottom: 0; }
       .rrflows-chat-bot strong { font-weight: 600; }
       .rrflows-chat-heading { display: block; font-size: 15px; margin: 8px 0 4px; }
