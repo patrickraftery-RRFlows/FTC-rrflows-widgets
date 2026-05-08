@@ -285,26 +285,6 @@
     row.appendChild(bubble)
     messages.appendChild(row)
 
-    // Source citation pills (rendered when webhook returns extras.sources)
-    if (role === 'bot' && extras && Array.isArray(extras.sources) && extras.sources.length > 0) {
-      const citations = document.createElement('div')
-      citations.className = 'rrflows-chat-citations'
-      const limit = Math.min(extras.sources.length, 4)
-      for (let i = 0; i < limit; i++) {
-        const src = extras.sources[i]
-        if (!src || !src.url) continue
-        const pill = document.createElement('a')
-        pill.className = 'rrflows-chat-citation-pill'
-        pill.href = src.url
-        pill.target = '_blank'
-        pill.rel = 'noopener noreferrer'
-        pill.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span class="rrflows-chat-citation-label"></span>'
-        pill.querySelector('.rrflows-chat-citation-label').textContent = src.title || src.url
-        citations.appendChild(pill)
-      }
-      messages.appendChild(citations)
-    }
-
     // Feedback thumbs for bot replies (skip welcome message + error fallbacks)
     if (role === 'bot' && extras && extras.allowFeedback) {
       const messageId = extras.messageId || ('msg-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8))
