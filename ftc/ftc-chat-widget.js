@@ -665,7 +665,7 @@
         z-index: 999999;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         font-size: 14px;
-        line-height: 1.5;
+        line-height: 1.65;
         color: var(--ftc-text);
       }
 
@@ -705,7 +705,7 @@
 
       /* Chat window */
       #rrflows-chat-window {
-        width: 380px;
+        width: 420px;
         max-width: calc(100vw - 40px);
         height: 540px;
         max-height: calc(100vh - 100px);
@@ -730,10 +730,10 @@
       #rrflows-chat-header {
         background: linear-gradient(135deg, var(--ftc-primary) 0%, var(--ftc-accent) 100%);
         color: #fff;
-        padding: 12px 14px;
+        padding: 14px 18px;
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 12px;
         flex-shrink: 0;
         box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
       }
@@ -814,13 +814,14 @@
         justify-content: flex-start;
       }
       .rrflows-chat-avatar {
-        width: 26px;
-        height: 26px;
+        width: 22px;
+        height: 22px;
         border-radius: 50%;
         background: #fff;
         border: 1px solid var(--ftc-border);
         flex-shrink: 0;
         margin-bottom: 2px;
+        opacity: 0.85;
       }
 
       /* Message bubbles */
@@ -848,7 +849,7 @@
         color: var(--ftc-text);
         border-radius: 16px 16px 16px 4px;
         border: 1px solid var(--ftc-border);
-        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08), 0 4px 10px rgba(15, 23, 42, 0.04);
       }
 
       /* Markdown content styles */
@@ -861,24 +862,25 @@
       .rrflows-chat-link:hover { color: var(--ftc-link-hover); }
       .rrflows-chat-list-item {
         display: block;
-        padding: 2px 0 2px 18px;
+        padding: 6px 0 6px 22px;
         position: relative;
       }
       .rrflows-chat-list-num {
         font-weight: 600;
         position: absolute;
         left: 0;
-        top: 2px;
+        top: 6px;
       }
       .rrflows-chat-bullet {
         display: inline-block;
-        width: 5px;
-        height: 5px;
-        background: var(--ftc-text-muted);
+        width: 6px;
+        height: 6px;
+        background: var(--ftc-primary);
+        opacity: 0.65;
         border-radius: 50%;
         position: absolute;
-        left: 6px;
-        top: 11px;
+        left: 7px;
+        top: 16px;
       }
 
       /* Welcome chips (shown on first open) */
@@ -912,16 +914,16 @@
       .rrflows-chat-chip {
         background: var(--ftc-chip-bg);
         border: 1px solid var(--ftc-chip-border);
-        border-radius: 16px;
-        padding: 6px 12px;
-        font-size: 12px;
+        border-radius: 14px;
+        padding: 4px 10px;
+        font-size: 11px;
         color: var(--ftc-primary);
         cursor: pointer;
         transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
         text-align: left;
         line-height: 1.4;
         font-family: inherit;
-        min-height: 30px;
+        min-height: 26px;
       }
       .rrflows-chat-chip:hover {
         background: #dde7f3;
